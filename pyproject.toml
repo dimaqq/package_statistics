@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "10 most verbose packages"
 authors = ["Dima Tisnek <dimaqq@gmail.com>"]
 license = "MIT"
-readme = "README.md"
+readme = "readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
