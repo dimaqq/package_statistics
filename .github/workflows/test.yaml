@@ -16,3 +16,5 @@ jobs:
           version: 1.5.1
       - run: poetry install
       - run: poetry run pytest --verbose
+      - run: poetry run mypy *.py
+      - run: poetry run ruff *.py
