@@ -18,3 +18,9 @@ pytest = "^7.4.3"
 mypy = "^1.7.0"
 ruff = "^0.1.5"
 ruff-lsp = "^0.0.45"
+
+[tool.pytest.ini_options]
+markers = ["network: slow and require egress (deselect with '-m \"not network\"')"]
+
+[tool.ruff]
+extend-select = ["I"]

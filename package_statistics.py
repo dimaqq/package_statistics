@@ -47,7 +47,7 @@ parser.add_argument("-v", "--validate", action="store_true", help="Validate chec
 parser.add_argument("-m", "--mirror", type=str, help="Specify a mirror to use")
 parser.add_argument("arch", type=str, help="Package architecture to query")
 
-PRIMARY = "http://ftp.uk.debian.org/debian/dists/stable/main/"
+PRIMARY = "http://ftp.uk.debian.org/debian/"
 
 ARCHES = (
     "all",
@@ -74,7 +74,7 @@ def validate_download(mirror: str, body: bytes, etag: str):
     - truncated download: will be detected
     """
     hash = sha256(body).hexdigest()
-    url = "%s/by-hash/SHA256/%s" % (mirror.rstrip("/"), hash)
+    url = "%s/dists/stable/main/by-hash/SHA256/%s" % (mirror.rstrip("/"), hash)
     try:
         with urlopen(Request(url, method="HEAD")) as r:
             if r.status != 200:
@@ -100,7 +100,7 @@ def main(mirror: str, arch: str, validate: bool = False):
     if arch not in ARCHES:
         warnings.warn("Unknown architecture %r" % arch)
 
-    url = "%s/Contents-%s.gz" % (mirror.rstrip("/"), arch)
+    url = "%s/dists/stable/main/Contents-%s.gz" % (mirror.rstrip("/"), arch)
     etag, body = download(url)
     if validate:
         validate_download(mirror, body, etag)

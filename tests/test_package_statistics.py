@@ -1,6 +1,8 @@
 from textwrap import dedent
 
-from package_statistics import parsefile, summary, tabulate
+import pytest
+
+from package_statistics import PRIMARY, Failed, main, parsefile, summary, tabulate
 
 
 def test_prasefile():
@@ -40,5 +42,17 @@ def test_smoke(pytestconfig):
         assert tabulate(summary(parsefile(f))) == expected
 
 
-def test_functional():
-    ...
+@pytest.mark.network
+def test_functional(capsys):
+    main(PRIMARY, "arm64", True)
+    stdout = capsys.readouterr().out
+    assert "\n10. " in stdout
+    # The leaderboard may change, but dev libs are likely to stay on
+    assert "libdevel" in stdout
+
+
+@pytest.mark.network
+@pytest.mark.filterwarnings("ignore::UserWarning")
+def test_negative():
+    with pytest.raises(Failed):
+        main("https://google.com", "foobar", False)
