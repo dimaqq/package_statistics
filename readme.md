@@ -42,3 +42,18 @@ The latter is needed because `ubuntu-latest` only provides `arm64` Python packag
 
 * ½h: pyproject, ruff, pre-commit, github actions, pytest
 * ...
+
+### To Do
+
+When using `act` locally:
+
+```
+[test.yaml/pytest-3] ⭐ Run Post actions/setup-python@v4.7.1
+[test.yaml/pytest-3]   🐳  docker exec cmd=[node /var/run/act/actions/actions-setup-python@v4.7.1/dist/cache-save/index.js] user= workdir=
+| OCI runtime exec failed: exec failed: unable to start container process: exec: "node": executable file not found in $PATH: unknown
+[test.yaml/pytest-3]   ❌  Failure - Post actions/setup-python@v4.7.1
+```
+
+Why is the post-action failing when everything else works fine?
+`node` is implicit, the rest is a mystery.
+https://github.com/nektos/act/issues/973
