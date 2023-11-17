@@ -1,13 +1,14 @@
-#!/usr/bin/env python
-from argparse import ArgumentParser, ArgumentError
-from collections import Counter
-from typing import Iterable, Dict, List, Tuple, Any
-from urllib.request import urlopen, Request
-from hashlib import sha256
-import io
+#!/usr/bin/env python3
 import gzip
+import io
 import operator
 import warnings
+from argparse import ArgumentError, ArgumentParser
+from collections import Counter
+from hashlib import sha256
+from typing import Any, Dict, Iterable, List, TextIO, Tuple, cast
+from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 
 def parsefile(afile: Iterable[str]) -> Dict[str, int]:
@@ -74,19 +75,25 @@ def validate_download(mirror: str, body: bytes, etag: str):
     """
     hash = sha256(body).hexdigest()
     url = "%s/by-hash/SHA256/%s" % (mirror.rstrip("/"), hash)
-    with urlopen(Request(url, method="HEAD")) as r:
-        if r.status != 200:
-            warnings.warn("Unable to validate download, code %s", r.status)
-        if r.headers.get("ETag") != etag:
-            # Since Bug#473392 was resolved, ETag is consistent
-            warnings.warn("Unable to validate download, ETag mismatch")
+    try:
+        with urlopen(Request(url, method="HEAD")) as r:
+            if r.status != 200:
+                warnings.warn("Unable to validate download, code %s", r.status)
+            if r.headers.get("ETag") != etag:
+                # Since Bug#473392 was resolved, ETag is consistent
+                warnings.warn("Unable to validate download, ETag mismatch")
+    except URLError as e:
+        warnings.warn("Failed to validate %s" % e)
 
 
 def download(url: str) -> Tuple[str, bytes]:
-    with urlopen(url) as r:
-        if r.status != 200:
-            raise Exception("Failed to download", url, r.status)
-        return r.headers.get("ETag"), r.read()
+    try:
+        with urlopen(url) as r:
+            if r.status != 200:
+                raise Exception("Failed to download", url, r.status)
+            return r.headers.get("ETag"), r.read()
+    except URLError as e:
+        raise Failed(str(e))
 
 
 def main(mirror: str, arch: str, validate: bool = False):
@@ -99,7 +106,12 @@ def main(mirror: str, arch: str, validate: bool = False):
         validate_download(mirror, body, etag)
 
     with gzip.open(io.BytesIO(body), "rt") as f:
+        f = cast(TextIO, f)
         print(tabulate(summary(parsefile(f))))
+
+
+class Failed(Exception):
+    ...
 
 
 if __name__ == "__main__":
@@ -109,4 +121,8 @@ if __name__ == "__main__":
         parser.print_help()
         raise SystemExit(1)
 
-    main(args.mirror or PRIMARY, args.arch, args.validate)
+    try:
+        main(args.mirror or PRIMARY, args.arch, args.validate)
+    except Failed as e:
+        print("Failed,", e)
+        raise SystemExit(1)
