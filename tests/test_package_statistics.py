@@ -4,8 +4,9 @@ from package_statistics import parsefile, summary, tabulate
 
 def test_prasefile():
     assert not parsefile("")
-    assert parsefile(("aa A", "bb A")) == {"A": 2}
-    assert parsefile(("aa A", "bb A,B")) == {"A": 2, "B": 1}
+    assert parsefile(["aa A", "bb A"]) == {"A": 2}
+    assert parsefile(["aa A", "bb A,B"]) == {"A": 2, "B": 1}
+    assert parsefile(["a a a A"]) == {"A": 1}
 
 
 def test_summary():
@@ -36,3 +37,7 @@ def test_smoke(pytestconfig):
 
     with (pytestconfig.rootpath / "tests/data/sample").open("r") as f:
         assert tabulate(summary(parsefile(f))) == expected
+
+
+def test_functional():
+    ...
