@@ -1,11 +1,11 @@
 ### Checklist
 
-- [ ] document assumptions
-- [ ] this readme
-- [ ] testing
-- [ ] cover all supported Python versions
+- [x] document assumptions
+- [x] this readme
+- [x] testing
+- [x] cover all supported Python versions
 - [ ] validate downloaded file checksums
-- [ ] algorithm
+- [x] algorithm
 
 ### Assumptions
 
@@ -13,6 +13,8 @@
 - Allow any supported Python version, today 3.8 ~ 3.12
 - Distribute as a single file, `package_statistics.py`
 - Keep dev-time stuff (tests, test data, scaffolding) separate
+- Is *section* important in the package name?
+  - The tool is built for distro maintainers, verbose is better than smart
 
 ### Testing
 
@@ -41,7 +43,7 @@ The latter is needed because `ubuntu-latest` only provides `arm64` Python packag
 ### Time Spent
 
 * ½h: pyproject, ruff, pre-commit, github actions, pytest
-* ...
+* 2h: research the format, write the algorithm and tests
 
 ### To Do
 
